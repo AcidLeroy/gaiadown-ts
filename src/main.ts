@@ -1,33 +1,72 @@
-/**
- * Some predefined delays (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
+import {AbstractLevelDOWN,
+  ErrorCallback,
+  AbstractOpenOptions,
+  ErrorValueCallback,
+  AbstractGetOptions,
+  AbstractOptions,
+  AbstractChainedBatch,
+  AbstractIteratorOptions,
+  AbstractIterator
+} from 'abstract-leveldown'; 
+import {
+  SessionInterface, 
+} from './blockstack-interfaces'
+
+
+class GaiaLevelDOWN implements AbstractLevelDOWN {
+  location : string;
+  userSession: SessionInterface;
+
+  constructor(location: string, userSession: SessionInterface) {
+    this.location = location; 
+    this.userSession = userSession; 
+    console.log("You created a GaiaLevelDOWN object!")
+  }
+
+  status() : string{
+    return 'open';
+  }
+
+  readonly [k: string]: any;
+  open(cb: ErrorCallback): void;
+  open(options: AbstractOpenOptions, cb: ErrorCallback): void;
+  open(options: any, cb?: any) {
+    throw new Error("'Open' Method not implemented.");
+  }
+  close(cb: ErrorCallback): void {
+    throw new Error("'close' Method not implemented.");
+  }
+  get(key: any, cb: ErrorValueCallback<any>): void;
+  get(key: any, options: AbstractGetOptions, cb: ErrorValueCallback<any>): void;
+  get(key: any, options: any, cb?: ErrorValueCallback<any>) {
+    this.userSession.getFile(key, options).then(x => {
+      if(cb) cb(null, x)
+    }).catch(err => {
+      if(cb) cb(err, null)
+    })
+  }
+  put(key: any, value: any, cb: ErrorCallback): void;
+  put(key: any, value: any, options: AbstractOptions, cb: ErrorCallback): void;
+  put(key: any, value: any, options: AbstractOptions, cb?: ErrorCallback) {
+    this.userSession.putFile(key, value, options).then(x => {
+      if (cb) cb(null)
+    }).catch(e => {
+      if (cb) cb(e)
+    })
+  }
+  del(key: any, cb: ErrorCallback): void;
+  del(key: any, options: AbstractOptions, cb: ErrorCallback): void;
+  del(key: any, options: any, cb?: any) {
+    throw new Error("Method not implemented.");
+  }
+  batch(): AbstractChainedBatch<any, any>{
+    throw new Error("Method not implemented.");
+  }
+
+  iterator(options?: AbstractIteratorOptions<any>): AbstractIterator<any, any> {
+    throw new Error("Method not implemented.");
+  }
+
 }
 
-/**
- * Returns a Promise<string> that resolves after given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - Number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
-}
-
-// Below are examples of using TSLint errors suppression
-// Here it is suppressing missing type definitions for greeter function
-
-// tslint:disable-next-line typedef
-export async function greeter(name) {
-  // tslint:disable-next-line no-unsafe-any no-return-await
-  return await delayedHello(name, Delays.Long);
-}
+export default GaiaLevelDOWN; 

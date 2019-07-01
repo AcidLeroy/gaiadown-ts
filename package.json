@@ -1,7 +1,7 @@
 {
-  "name": "node-typescript-boilerplate",
+  "name": "gaiadown-ts",
   "version": "0.0.0",
-  "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
+  "description": "Gaia backend for LevelUP DB.",
   "engines": {
     "node": ">= 10.13 <11"
   },
@@ -26,9 +26,13 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
-  "author": "Jakub Synowiec <github@jakubsynowiec.info>",
+  "author": "Cody Eilar cody@mylens.io",
   "license": "Apache-2.0",
   "dependencies": {
+    "@types/abstract-leveldown": "^5.0.1",
+    "@types/levelup": "^3.1.1",
+    "abstract-leveldown": "^6.0.3",
+    "levelup": "^4.1.0",
     "tslib": "~1.10.0"
   }
 }

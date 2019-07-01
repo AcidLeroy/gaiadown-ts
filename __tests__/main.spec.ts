@@ -1,30 +1,45 @@
-import { Delays, greeter } from '../src/main';
+// import LevelUp from 'levelup'
+var levelup = require('levelup')
+import GaiaLevelDOWN from '../src/main';
+import {SessionInterface, GetFileOptions, PutFileOptions} from '../src/blockstack-interfaces'; 
 
-describe('greeter function', () => {
-  // Read more about fake timers: http://facebook.github.io/jest/docs/en/timer-mocks.html#content
-  jest.useFakeTimers();
 
-  const name: string = 'John';
-  let hello: string;
+class MockSession implements SessionInterface {
 
-  // Act before assertions
-  beforeAll(async () => {
-    const p: Promise<string> = greeter(name);
-    jest.runOnlyPendingTimers();
-    hello = await p;
-  });
+  store : any
+  constructor() {
+    this.store = {}; 
+  }
+  
+  async getFile(path: string, options?: GetFileOptions): Promise<string | ArrayBuffer> {
+    return this.store[path];
+  }
+  async putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string> {
+    this.store[path] = content
+    return ""; 
+  }
 
-  // Assert if setTimeout was called properly
-  it('delays the greeting by 2 seconds', () => {
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-    expect(setTimeout).toHaveBeenLastCalledWith(
-      expect.any(Function),
-      Delays.Long,
-    );
-  });
+}
 
-  // Assert greeter result
-  it('greets a user with `Hello, {name}` message', () => {
-    expect(hello).toBe(`Hello, ${name}`);
-  });
+describe('Test GaiaLevelDOWN capability', () => {
+  test('Put and get', () => {
+    let mockSession = new MockSession(); 
+    let gaiaDb = new GaiaLevelDOWN("location", mockSession); 
+    console.log('gaiaDb = ', gaiaDb)
+    let db = levelup(gaiaDb)
+    db.put("key", "value")
+    // db.put("key", "Somevalue", {encrypt: true}, (err?) => {
+    //   if(err) throw new Error('Could not put key into the gaia storage!')
+    //   else {
+    //     db.get("key", (err, value) => {
+    //       if (err) throw new Error('Could not get the key!')
+    //       else {
+    //         expect(value).toBe("Somevalue")
+    //       }
+    //     })
+    //   }
+    // })
+    expect(true).toBe(true) 
+
+  })
 });
