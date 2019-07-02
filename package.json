@@ -6,7 +6,11 @@
     "node": ">= 10.13 <11"
   },
   "devDependencies": {
+    "@types/abstract-leveldown": "^5.0.1",
+    "@types/immediate": "^3.2.0",
     "@types/jest": "^24.0.15",
+    "@types/levelup": "^3.1.1",
+    "@types/loglevel": "^1.6.3",
     "@types/node": "^10.14.10",
     "jest": "~24.8.0",
     "prettier": "~1.18.2",
@@ -29,10 +33,10 @@
   "author": "Cody Eilar cody@mylens.io",
   "license": "Apache-2.0",
   "dependencies": {
-    "@types/abstract-leveldown": "^5.0.1",
-    "@types/levelup": "^3.1.1",
     "abstract-leveldown": "^6.0.3",
+    "immediate": "^3.2.3",
     "levelup": "^4.1.0",
+    "loglevel": "^1.6.3",
     "tslib": "~1.10.0"
   }
 }

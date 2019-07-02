@@ -1,9 +1,11 @@
+import { AbstractGetOptions } from 'abstract-leveldown';
+
 export interface GetFileUrlOptions {
     username?: string;
     app?: string;
     zoneFileLookupURL?: string;
   }
-  export interface GetFileOptions extends GetFileUrlOptions {
+  export interface GetFileOptions extends GetFileUrlOptions, AbstractGetOptions {
     /**
      * Try to decrypt the data with the app private key.
      * @default true
