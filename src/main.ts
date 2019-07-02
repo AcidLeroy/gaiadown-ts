@@ -16,6 +16,7 @@ import {
 class GaiaLevelDOWN implements AbstractLevelDOWN {
   location : string;
   userSession: SessionInterface;
+  status : string = 'open'
 
   constructor(location: string, userSession: SessionInterface) {
     this.location = location; 
@@ -23,15 +24,12 @@ class GaiaLevelDOWN implements AbstractLevelDOWN {
     console.log("You created a GaiaLevelDOWN object!")
   }
 
-  status() : string{
-    return 'open';
-  }
-
+ 
   readonly [k: string]: any;
   open(cb: ErrorCallback): void;
   open(options: AbstractOpenOptions, cb: ErrorCallback): void;
   open(options: any, cb?: any) {
-    throw new Error("'Open' Method not implemented.");
+    throw new Error("'open' Method not implemented.");
   }
   close(cb: ErrorCallback): void {
     throw new Error("'close' Method not implemented.");
