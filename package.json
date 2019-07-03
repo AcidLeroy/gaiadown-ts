@@ -15,6 +15,7 @@
     "jest": "~24.8.0",
     "prettier": "~1.18.2",
     "rimraf": "^2.6.3",
+    "tape": "^4.11.0",
     "ts-jest": "^24.0.0",
     "tslint": "~5.18.0",
     "tslint-config-prettier": "1.18.0",
