@@ -46,4 +46,5 @@ export interface GetFileUrlOptions {
   export interface SessionInterface {
     getFile(path: string, Options?: GetFileOptions) : Promise<string | ArrayBuffer> 
     putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string>
+    deleteFile(path: string, options?: object): Promise<void>
   }

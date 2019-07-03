@@ -1,34 +1,42 @@
 import LevelUp from 'levelup'
 import GaiaLevelDOWN from '../src/main';
-import {SessionInterface, GetFileOptions, PutFileOptions} from '../src/blockstack-interfaces'; 
-// const tapeTest = require('tape')
-// const suite = require('abstract-leveldown/test')
+import { SessionInterface, GetFileOptions, PutFileOptions } from '../src/blockstack-interfaces';
 
-class MockSession implements SessionInterface {
-  store : any
+import * as log from 'loglevel';
+const tapeTest = require('tape')
+const suite = require('abstract-leveldown/test')
+
+
+export class MockSession implements SessionInterface {
+
+  store: any
   constructor() {
-    this.store = {}; 
+    this.store = {};
   }
 
   async getFile(path: string, options?: GetFileOptions): Promise<string | ArrayBuffer> {
     return this.store[path];
   }
+
   async putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string> {
     this.store[path] = content
-    return ""; 
+    return "";
   }
 
+  async deleteFile(path: string, options?: object): Promise<void> {
+    delete this.store[path]
+  }
 }
 
 describe('Test GaiaLevelDOWN get/put', () => {
   test('Put and get', () => {
-    let mockSession = new MockSession(); 
-    let gaiaDb = new GaiaLevelDOWN("location", mockSession); 
+    log.setDefaultLevel('DEBUG')
+    let mockSession = new MockSession();
+    let gaiaDb = new GaiaLevelDOWN("location", mockSession);
     console.log('gaiaDb = ', gaiaDb)
     let db = LevelUp(gaiaDb)
-    db.put("key", "value")
-    db.put("key", "Somevalue", {encrypt: true}, (err?) => {
-      if(err) throw new Error('Could not put key into the gaia storage!')
+    db.put("key", "Somevalue", { encrypt: true }, (err?) => {
+      if (err) throw new Error('Could not put key into the gaia storage!')
       else {
         db.get("key", (err, value) => {
           if (err) throw new Error('Could not get the key!')
@@ -38,22 +46,28 @@ describe('Test GaiaLevelDOWN get/put', () => {
         })
       }
     })
-    expect(true).toBe(true) 
-
+    expect(true).toBe(true)
   })
+
+  test('put, get and delete.', async () => {
+    
+  })
+
+
 });
 
-// describe('Prove GaiaLevelDOWN is abstract-leveldown compliant', () =>{
-//   test('Run compliance check',  () => {
+test('Compliance Test with abstract-leveldown', () => {
+  log.info("starting the suite")
+  suite({
+    test: tapeTest,
+    factory: function () {
+      let mockSession = new MockSession();
+      let gaiaDb = new GaiaLevelDOWN("location", mockSession);
+      return gaiaDb
+    }
+  })
+  log.info('Finished the suite!!!')
+  expect(true).toBe(true)
+})
 
-//     suite({
-//       test: tapeTest,
-//       factory: function () {
-//         let mockSession = new MockSession(); 
-//         let gaiaDb = new GaiaLevelDOWN("location", mockSession); 
-//         return gaiaDb
-//       }
-//     })
-//     expect(true).toBe(true)
-//   })
-// })
+

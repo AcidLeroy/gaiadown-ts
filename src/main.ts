@@ -112,8 +112,8 @@ class GaiaLevelDOWN implements AbstractLevelDOWN<string, string | Buffer> {
     throw new Error("Method not implemented.");
   }
   batch(): AbstractChainedBatch<string, string | Buffer>;
-  batch(array: readonly AbstractBatch<string, string | Buffer>[], cb: ErrorCallback): AbstractChainedBatch<string, string | Buffer>;
-  batch(array: readonly AbstractBatch<string, string | Buffer>[], options: AbstractOptions, cb: ErrorCallback): AbstractChainedBatch<string, string | Buffer>;
+  batch(array:  AbstractBatch<string, string | Buffer>[], cb: ErrorCallback): AbstractChainedBatch<string, string | Buffer>;
+  batch(array:  AbstractBatch<string, string | Buffer>[], options: AbstractOptions, cb: ErrorCallback): AbstractChainedBatch<string, string | Buffer>;
   batch(array?: any, options?: any, cb?: any) : AbstractChainedBatch<string, string | Buffer> {
     throw new Error("Method not implemented.");
   }
