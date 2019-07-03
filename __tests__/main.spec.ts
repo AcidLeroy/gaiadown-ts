@@ -1,9 +1,11 @@
 import * as test from "tape";
+import * as log from 'loglevel';
+
 const suite = require('abstract-leveldown/test')
 
 import { SessionInterface, GetFileOptions, PutFileOptions } from '../src/blockstack-interfaces';
 import GaiaLevelDOWN from '../src/main';
-import LevelUp from 'levelup';
+// import LevelUp from 'levelup';
 
 class MockSession implements SessionInterface {
 
@@ -26,13 +28,14 @@ class MockSession implements SessionInterface {
   }
 }
 
+log.setDefaultLevel('debug')
 var testCommon = suite.common({
   test: test,
   factory: function () {
     let mockSession = new MockSession();
     let gaiaDb = new GaiaLevelDOWN("location", mockSession);
-    let db = LevelUp(gaiaDb)
-    return db
+    // let db = LevelUp(gaiaDb)
+    return gaiaDb
   },
   snapshots: false,
   seek: false,
