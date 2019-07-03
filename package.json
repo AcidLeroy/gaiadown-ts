@@ -8,15 +8,14 @@
   "devDependencies": {
     "@types/abstract-leveldown": "^5.0.1",
     "@types/immediate": "^3.2.0",
-    "@types/jest": "^24.0.15",
     "@types/levelup": "^3.1.1",
     "@types/loglevel": "^1.6.3",
     "@types/node": "^10.14.10",
-    "jest": "~24.8.0",
+    "@types/tape": "^4.2.33",
     "prettier": "~1.18.2",
     "rimraf": "^2.6.3",
     "tape": "^4.11.0",
-    "ts-jest": "^24.0.0",
+    "ts-node": "^8.3.0",
     "tslint": "~5.18.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-microsoft-contrib": "~6.2.0",
@@ -28,8 +27,7 @@
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "tslint -t stylish --project \"tsconfig.json\"",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test": "ts-node node_modules/tape/bin/tape __tests__/**/*.ts"
   },
   "author": "Cody Eilar cody@mylens.io",
   "license": "Apache-2.0",

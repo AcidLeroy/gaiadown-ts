@@ -1,4 +1,5 @@
-import immediate from 'immediate'
+// import * as immediate from 'immediate'
+const immediate = require('immediate')
 import * as log from 'loglevel';
 import {AbstractLevelDOWN,
   ErrorCallback,
@@ -35,10 +36,16 @@ class GaiaLevelDOWN implements AbstractLevelDOWN<string, string | Buffer> {
   open(options: AbstractOpenOptions, cb?: ErrorCallback): void {
     log.debug('open: called open')
     this.status = 'open'
+    if(cb) {
+      immediate(() => {
+        return cb(null)
+      })
+    }
   }
   close(cb: ErrorCallback): void {
     log.debug('close: called close.')
     this.status = 'closed'
+    cb(null); 
   }
   get(key: string, cb: ErrorValueCallback<string | Buffer>): void;
   get(key: string, options: AbstractGetOptions, cb: ErrorValueCallback<string | Buffer>): void;
