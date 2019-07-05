@@ -31,6 +31,9 @@ import {
 // }
 
 class GaiaIterator extends AbstractIterator<string, string | Buffer> {
+  constructor(db : GaiaLevelDOWN, options: AbstractIteratorOptions<string>){
+    super(db)
+  }
 
 }
 
@@ -47,7 +50,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
   }
 
   _get(key: string, options: AbstractGetOptions, cb?: ErrorValueCallback<string | Buffer>) {
-    log.debug(`get: Getting key = '${key}. `)
+    log.debug(`get: Getting key = '${key}'. `)
     this.userSession.getFile(key, options).then(x => {
       if (cb) {
         log.debug("get: Succces, callback provided")
@@ -55,9 +58,14 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
           log.debug(`get: key '${key}' = '${x}'.`)
           if (x instanceof ArrayBuffer) {
             log.debug(`get: returned an ArrayBuffer.`)
+
             return cb(null, Buffer.from(x))
           } else {
             log.debug('get: return a string.')
+            if (options.asBuffer !== false && !Buffer.isBuffer(x)) {
+              let a = Buffer.from(String(x))
+              return cb(null, a)
+          }
             return cb(null, x)
           }
         })
@@ -68,16 +76,16 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
       if (cb) {
         log.error("get: Failure, callback was provided")
         immediate(() => {
-          let errorMessage = `get: Error when getting key = '${key}': ${err}`
+          let errorMessage = `get: NotFound error, key = '${key}': ${err}`
           log.error(errorMessage)
-          return cb(new Error(errorMessage), null)
+           return cb(new Error('NotFound'), undefined)
         })
       } else {
         immediate(() => {
           log.error("get: Failure, callback was NOT provided.")
-          let errorMessage = `get: Error when getting key = '${key}': ${err}`
+          let errorMessage = `get: NotFound error when getting key = '${key}': ${err}`
           log.error(errorMessage)
-          throw new Error(errorMessage)
+          throw new Error('NotFound')
         })
       }
     })
@@ -87,7 +95,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
     log.debug(`put: Putting key = '${key}', with value = '${(value instanceof Buffer) ? String(value) : value}'`)
     this.userSession.putFile(key, value, options).then(x => {
       immediate(() => {
-        log.debug`put: returned string = ${x}.`
+        log.debug(`put: returned string = ${x}.`)
         if (cb) {
           log.debug(`put: Success, callback was provided.`)
           return cb(null);
@@ -111,7 +119,22 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
   }
  
   _del(key: string, options: AbstractOptions, cb?: ErrorCallback) {
-    throw new Error("del: Method not implemented.");
+    log.debug(`del: Deleting key: '${key}.`)
+    this.userSession.deleteFile(key, options).then(x => {
+      if (cb) {
+        log.debug(`del: Successfully deleted key '${key} with a callback.`)
+        immediate(() => cb(null))
+      } else {
+        log.debug(`delete: Successfully deleted key '${key}' with no callback.`)
+      }
+    }).catch( err => {
+      log.error(`del: Failure deleting key '${key}': ${err}`)
+      if (cb) {
+        cb(new Error(`Could not delete key '${key}': ${err}`))
+      } else {
+        throw new Error(`Coudl not delete key '${key}': ${err}`)
+      }
+    })
   }
  
   _batch(array?: any, options?: any, cb?: any): AbstractChainedBatch<string, string | Buffer> {
@@ -119,7 +142,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
   }
 
   _iterator(options?: AbstractIteratorOptions<string>): AbstractIterator<string, string | Buffer> {
-    return new GaiaIterator(this); 
+    return new GaiaIterator(this, options); 
   }
 
 }
