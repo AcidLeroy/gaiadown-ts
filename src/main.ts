@@ -6,13 +6,12 @@ import {
   ErrorCallback,
   // AbstractOpenOptions,
   ErrorValueCallback,
-  // ErrorKeyValueCallback,
+  ErrorKeyValueCallback,
   AbstractGetOptions,
   AbstractOptions,
-  AbstractChainedBatch,
   AbstractIteratorOptions,
   AbstractIterator,
-  // AbstractBatch
+  AbstractBatch,
 } from 'abstract-leveldown';
 import {
   SessionInterface,
@@ -30,9 +29,89 @@ import {
 //   return ltgt.compare(value, this._finish) <= 0
 // }
 
+
 class GaiaIterator extends AbstractIterator<string, string | Buffer> {
-  constructor(db : GaiaLevelDOWN, options: AbstractIteratorOptions<string>){
+
+  db: GaiaLevelDOWN;
+  limit: number = Infinity;
+  keyAsBuffer: boolean;
+  valueAsBuffer: boolean;
+  reverse: boolean = false;
+  done: number = 0;
+  sortedKeys: string[] = [];
+  fetchedFileNames: boolean = false;
+  constructor(db: GaiaLevelDOWN, options: AbstractIteratorOptions<string>) {
     super(db)
+    this.db = db
+    log.debug('GaiaIterator options = ', options)
+    if (options.limit != -1 && (typeof options.limit !== 'undefined')) {
+      this.limit = options.limit
+    }
+
+    this.keyAsBuffer = options.keyAsBuffer !== false
+    this.valueAsBuffer = options.valueAsBuffer !== false
+    this.reverse = options.reverse
+
+  }
+
+  fetchAllKeys() : Promise<string[]> {
+    let keys = []
+      return this.db.userSession.listFiles((filename): boolean => {
+        keys.push(filename);
+        return true
+      }).then(n => {
+        log.debug('Took a snap shot of ', n, 'files')
+        this.sortedKeys = (this.reverse) ? keys.reverse() : keys.sort()
+        log.debug('The sorted keys are : ', this.sortedKeys)
+        // TODO: filter out prefix/location.
+        return this.sortedKeys
+      })
+  }
+
+  fetchNext(cb: ErrorKeyValueCallback<string, string | Buffer>) {
+    if (this.done++ >= this.limit) {
+      return immediate(cb);
+    }
+    let options = {} // TODO: how to handle encryption
+    let key = this.sortedKeys[this.done-1]
+    this.db.userSession.getFile(key, options).then( val => {
+      if(cb) {
+        log.debug('iterator.next: Success getting key: ', key)
+        if ( val instanceof ArrayBuffer){
+          log.debug('iterator.next: Value is an instance of an ArrayBuffer.')
+          return cb(null, key, Buffer.from(val))
+
+        } else {
+          if (this.asBuffer && !Buffer.isBuffer(val)) {
+            let a = Buffer.from(String(val))
+            return cb(null, key, a)
+          }
+          return cb(null, key, val)
+        }
+      }
+    }).catch(e => {
+      log.error(`Iterator.next: Recevied an error fetching key = ${key}: ${e}`)
+      if (cb) {
+        immediate(cb) //cb(undefined, null, null)
+      } else {
+        log.error('Iterator.next: Callback was not set.')
+        throw new Error(`Iterator.next: Recevied an error fetching key = ${key}: ${e}`)
+      }
+    }) 
+  }
+  _next(cb: ErrorKeyValueCallback<string, string | Buffer>) {
+    if (this.limit == 0) return immediate(cb)
+    // This is where things might get a bit wonky. In order to iterate
+    // over files, I have no choice but to fetch all of the file names 
+    // in Gaia an then iterate over those.
+    if (!this.fetchedFileNames) {
+      this.fetchedFileNames = true;
+      this.fetchAllKeys().then(keys => {
+        this.fetchNext(cb); 
+      })
+    } else {
+      this.fetchNext(cb); 
+    }
   }
 
 }
@@ -65,7 +144,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
             if (options.asBuffer !== false && !Buffer.isBuffer(x)) {
               let a = Buffer.from(String(x))
               return cb(null, a)
-          }
+            }
             return cb(null, x)
           }
         })
@@ -78,7 +157,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
         immediate(() => {
           let errorMessage = `get: NotFound error, key = '${key}': ${err}`
           log.error(errorMessage)
-           return cb(new Error('NotFound'), undefined)
+          return cb(new Error('NotFound'), undefined)
         })
       } else {
         immediate(() => {
@@ -117,7 +196,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
       })
     })
   }
- 
+
   _del(key: string, options: AbstractOptions, cb?: ErrorCallback) {
     log.debug(`del: Deleting key: '${key}.`)
     this.userSession.deleteFile(key, options).then(x => {
@@ -127,7 +206,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
       } else {
         log.debug(`delete: Successfully deleted key '${key}' with no callback.`)
       }
-    }).catch( err => {
+    }).catch(err => {
       log.error(`del: Failure deleting key '${key}': ${err}`)
       if (cb) {
         cb(new Error(`Could not delete key '${key}': ${err}`))
@@ -136,13 +215,37 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
       }
     })
   }
- 
-  _batch(array?: any, options?: any, cb?: any): AbstractChainedBatch<string, string | Buffer> {
-    throw new Error("batch: Method not implemented.");
+
+  _batch(array?: ReadonlyArray<AbstractBatch<string, string | Buffer>>, options?: AbstractOptions, cb?: ErrorCallback): void {
+    let p = []
+    array.forEach(x => {
+      if (x.type == 'put') {
+        p.push(this.userSession.putFile(x.key, x.value, options))
+      } else if (x.type == 'del') {
+        p.push(this.userSession.deleteFile(x.key, options))
+      }
+    })
+    Promise.all(p).then(x => {
+      log.debug('batch: Successfully ran batch: ', x)
+      if (cb) {
+        return immediate(cb)
+      } else {
+        log.debug(`batch: No call back provided`)
+      }
+    }).catch(e => {
+      log.error(`batch: Failed to batch call: ${e}`)
+      if (cb) {
+        return immediate(() => cb(new Error(`Batch failed: ${e}`)))
+      } else {
+        throw new Error(`Batch failed: ${e}`)
+      }
+    })
   }
 
+
   _iterator(options?: AbstractIteratorOptions<string>): AbstractIterator<string, string | Buffer> {
-    return new GaiaIterator(this, options); 
+    // throw new Error('_iterator: Not implemented yet!')
+    return new GaiaIterator(this, options);
   }
 
 }
