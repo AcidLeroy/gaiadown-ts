@@ -1,5 +1,5 @@
 const immediate = require('immediate')
-// const ltgt = require('ltgt')
+const ltgt = require('ltgt')
 import * as log from 'loglevel';
 import {
   AbstractLevelDOWN,
@@ -17,19 +17,6 @@ import {
   SessionInterface,
 } from './blockstack-interfaces'
 
-// function nullEmptyUndefined(v) {
-//   return typeof v === 'undefined' || v === null || v === ''
-// }
-
-// function lt(value) {
-//   return ltgt.compare(value, this._finish) < 0
-// }
-
-// function lte(value) {
-//   return ltgt.compare(value, this._finish) <= 0
-// }
-
-
 class GaiaIterator extends AbstractIterator<string, string | Buffer> {
 
   db: GaiaLevelDOWN;
@@ -40,6 +27,8 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
   done: number = 0;
   sortedKeys: string[] = [];
   fetchedFileNames: boolean = false;
+  options : AbstractIteratorOptions<string>; 
+
   constructor(db: GaiaLevelDOWN, options: AbstractIteratorOptions<string>) {
     super(db)
     this.db = db
@@ -48,10 +37,10 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
       this.limit = options.limit
     }
 
-    this.keyAsBuffer = options.keyAsBuffer !== false
-    this.valueAsBuffer = options.valueAsBuffer !== false
-    this.reverse = options.reverse
-
+    this.keyAsBuffer = options.keyAsBuffer !== false;
+    this.valueAsBuffer = options.valueAsBuffer !== false;
+    this.reverse = options.reverse;
+    this.options = options; 
   }
 
   fetchAllKeys() : Promise<string[]> {
@@ -61,9 +50,11 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
         return true
       }).then(n => {
         log.debug('Took a snap shot of ', n, 'files')
-        this.sortedKeys = (this.reverse) ? keys.reverse() : keys.sort()
-        log.debug('The sorted keys are : ', this.sortedKeys)
-        // TODO: filter out prefix/location.
+        this.reverse ? keys.sort().reverse() : keys.sort()
+        let temp = keys.filter(ltgt.filter(this.options))
+        console.log(`temp = , ${temp}`)
+        Object.assign(this.sortedKeys, temp)
+        log.debug(`The sorted keys are :  ${this.sortedKeys}`)
         return this.sortedKeys
       })
   }
@@ -253,7 +244,6 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
 
 
   _iterator(options?: AbstractIteratorOptions<string>): AbstractIterator<string, string | Buffer> {
-    // throw new Error('_iterator: Not implemented yet!')
     return new GaiaIterator(this, options);
   }
 
