@@ -3,7 +3,7 @@
 [Gaia](https://github.com/blockstack/gaia) storage backend for [LevelUP](https://github.com/Level/levelup). The API implements the 
 [abstract-leveldown](https://github.com/Level/abstract-leveldown) interface. 
 
-#Example
+# Example
 
 ```ts
 import GaiaDOWN from 'gaiadown-ts' 
