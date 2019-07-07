@@ -1,6 +1,7 @@
 import * as test from "tape";
 import * as log from 'loglevel';
 import * as blockstack from 'blockstack'; 
+import levelup from 'levelup'
 const suite = require('abstract-leveldown/test')
 
 import { SessionInterface, GetFileOptions, PutFileOptions } from '../src/blockstack-interfaces';
@@ -80,4 +81,20 @@ var testCommon = suite.common({
 })
 
 suite(testCommon)
+
+test('Example', (t) => {
+  let userSession = getSession(); 
+  const db = levelup(new GaiaLevelDOWN("Not implemented!", userSession))
+  db.put('foo', 'bar', function (err) {
+    if (err) throw err
+  
+    db.get('foo', function (err, value) {
+      if (err) throw err
+  
+      console.log(String(value)) // 'bar'
+      t.end()
+    })
+  })
+  
+})
 
