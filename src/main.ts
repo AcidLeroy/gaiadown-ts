@@ -68,25 +68,34 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
       })
   }
 
-  fetchNext(cb: ErrorKeyValueCallback<string, string | Buffer>) {
+
+  fetchNext(cb: ErrorKeyValueCallback<string | Buffer, string | Buffer>) {
+    let key = this.sortedKeys[this.done]
     if (this.done++ >= this.limit) {
       return immediate(cb);
     }
+    if (!key) {
+      log.debug('fetchNext: no more keys.')
+      return immediate(cb)
+    }
+
+    let returnedKey = this.keyAsBuffer? Buffer.from(key) : key
+
     let options = {} // TODO: how to handle encryption
-    let key = this.sortedKeys[this.done-1]
+    
     this.db.userSession.getFile(key, options).then( val => {
       if(cb) {
         log.debug('iterator.next: Success getting key: ', key)
         if ( val instanceof ArrayBuffer){
           log.debug('iterator.next: Value is an instance of an ArrayBuffer.')
-          return cb(null, key, Buffer.from(val))
+          return cb(null, returnedKey, Buffer.from(val))
 
         } else {
-          if (this.asBuffer && !Buffer.isBuffer(val)) {
+          if (this.valueAsBuffer && !Buffer.isBuffer(val)) {
             let a = Buffer.from(String(val))
-            return cb(null, key, a)
+            return cb(null, returnedKey, a)
           }
-          return cb(null, key, val)
+          return cb(null, returnedKey, val)
         }
       }
     }).catch(e => {
@@ -99,7 +108,7 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
       }
     }) 
   }
-  _next(cb: ErrorKeyValueCallback<string, string | Buffer>) {
+  _next(cb: ErrorKeyValueCallback<string | Buffer, string | Buffer>) {
     if (this.limit == 0) return immediate(cb)
     // This is where things might get a bit wonky. In order to iterate
     // over files, I have no choice but to fetch all of the file names 
