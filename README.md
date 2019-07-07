@@ -22,3 +22,6 @@ const db = levelup(new GaiaLevelDOWN("Not implemented!", userSession))
 
 ```
 
+# API
+Please see [LevelUP](https://github.com/Level/levelup) for API. 
+
