@@ -12,7 +12,7 @@
 import GaiaDOWN from 'gaiadown-ts' 
 import levelup from 'levelup'
 
-const db = levelup(new GaiaLevelDOWN("Not implemented!", userSession))
+const db = levelup(new GaiaLevelDOWN("prefix/location", userSession))
   db.put('foo', 'bar', function (err) {
     if (err) throw err
   
