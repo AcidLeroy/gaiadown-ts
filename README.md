@@ -1,24 +1,37 @@
 # GaiaDown
 
 [Gaia](https://github.com/blockstack/gaia) storage backend for [LevelUP](https://github.com/Level/levelup). The API implements the 
-[abstract-leveldown](https://github.com/Level/abstract-leveldown) interface. 
+[abstract-leveldown](https://github.com/Level/abstract-leveldown) interface. Specifically, this module needs a [UserSession](https://blockstack.github.io/blockstack.js/classes/usersession.html) object to create the `GaiaDOWN` instance. Furthermore, all the options that `getFile` and `putFile` take can also be used in the LevelDB instance. 
+This allows you to encrypt/decrypt and sign/verify your data. 
 
 
 [![Build Status](https://travis-ci.com/AcidLeroy/gaiadown-ts.svg?branch=master)](https://travis-ci.com/AcidLeroy/gaiadown-ts)
 
 # Example
 
+
 ```ts
 import GaiaDOWN from 'gaiadown-ts' 
 import levelup from 'levelup'
 
-const db = levelup(new GaiaLevelDOWN("prefix/location", userSession))
-  db.put('foo', 'bar', function (err) {
+const db = levelup(new GaiaLevelDOWN("/prefix/location/", userSession))
+  // Can pass encrypt and sign options, same options as UserSession
+  let putOpts : PutFileOptions = {
+    encrypt: true, 
+    sign: false
+  }
+  db.put('foo', 'bar', putOpts, function (err) {
     if (err) throw err
-  
-    db.get('foo', function (err, value) {
+    // Can pass decrypt and verify options, same options as UserSession
+    let getOpts : GetFileOptions = {
+      decrypt: true, 
+      verify: false,
+    }
+    db.get('foo', getOpts, function (err, value) {
       if (err) throw err
+  
       console.log(String(value)) // 'bar'
+ 
     })
 
   })
