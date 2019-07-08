@@ -7,14 +7,16 @@ This allows you to encrypt/decrypt and sign/verify your data.
 
 [![Build Status](https://travis-ci.com/AcidLeroy/gaiadown-ts.svg?branch=master)](https://travis-ci.com/AcidLeroy/gaiadown-ts)
 
+# Installation
+`npm install gaiadown-ts`
+
 # Example
-
-
 ```ts
 import GaiaDOWN, {PutFileOptions, GetFileOptions} from 'gaiadown-ts' 
 import levelup from 'levelup'
 
-const db = levelup(new GaiaLevelDOWN("/prefix/location/", userSession))
+// Grab the UserSession object after logging in.
+const db = levelup(new GaiaDOWN("/prefix/location/", userSession))
   // Can pass encrypt and sign options, same options as UserSession
   let putOpts : PutFileOptions = {
     encrypt: true, 
