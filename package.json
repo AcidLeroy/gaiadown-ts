@@ -1,6 +1,6 @@
 {
   "name": "gaiadown-ts",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "description": "Gaia backend for LevelUP DB.",
   "engines": {
     "node": ">= 10.13 <11"
