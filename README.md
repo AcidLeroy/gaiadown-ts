@@ -31,11 +31,8 @@ const db = levelup(new GaiaDOWN("/prefix/location/", userSession))
     }
     db.get('foo', getOpts, function (err, value) {
       if (err) throw err
-  
       console.log(String(value)) // 'bar'
- 
     })
-
   })
 
 ```
