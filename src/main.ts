@@ -224,7 +224,7 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
     }).catch(err => {
       log.error(`del: Failure deleting key '${key}': ${err}`)
       if (cb) {
-        cb(new Error(`Could not delete key '${key}': ${err}`))
+        cb(null)
       } else {
         throw new Error(`Coudl not delete key '${key}': ${err}`)
       }

@@ -53,6 +53,10 @@ class MockSession implements SessionInterface {
   }
 
   async deleteFile(path: string, options?: object): Promise<void> {
+    if (typeof this.store[path] == "undefined") {
+      log.error('deleteFile: this is an issue!')
+      throw new Error('Gaia failed!')
+    }
     delete this.store[path]
   }
 
