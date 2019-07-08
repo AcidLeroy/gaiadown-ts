@@ -50,6 +50,7 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
         return true
       }).then(n => {
         log.debug('Took a snap shot of ', n, 'files')
+        keys = keys.filter(x => x.startsWith(this.db.location))
         this.reverse ? keys.sort().reverse() : keys.sort()
         let temp = keys.filter(ltgt.filter(this.options))
         console.log(`temp = , ${temp}`)
@@ -70,7 +71,9 @@ class GaiaIterator extends AbstractIterator<string, string | Buffer> {
       return immediate(cb)
     }
 
-    let returnedKey = this.keyAsBuffer? Buffer.from(key) : key
+    var re = new RegExp(this.db.location+"(.*)")
+    let fixedKey = key.match(re)[1]
+    let returnedKey = this.keyAsBuffer? Buffer.from(fixedKey) : fixedKey
 
     let options = {} // TODO: how to handle encryption
     
@@ -122,10 +125,15 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
 
   constructor(location: string, userSession: SessionInterface) {
     super(location)
-    this.location = location;
+    this.location = location.trim();
+    this.location += (this.location[this.location.length-1] == '/') ? "" : '/'
     this.userSession = userSession;
-    log.info(`You created a GaiaDOWN object at location ${location}.`)
+    log.info(`You created a GaiaDOWN object at location '${this.location}.'`)
     log.debug('Your userSession is: ', userSession)
+  }
+
+  _serializeKey(key: string) {
+    return this.location + key
   }
 
   _get(key: string, options: AbstractGetOptions, cb?: ErrorValueCallback<string | Buffer>) {
