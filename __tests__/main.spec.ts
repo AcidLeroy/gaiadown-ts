@@ -8,6 +8,27 @@ import { SessionInterface, GetFileOptions, PutFileOptions } from '../src/blockst
 import GaiaLevelDOWN from '../src/main';
 // import LevelUp from 'levelup';
 
+const ENCRYPTED : string = "ENCRYPTED"
+
+function encrypt(val : string | Buffer): string | Buffer{
+  if (val instanceof Buffer) {
+    return Buffer.from(String(val)+ ENCRYPTED) 
+  } else {
+    return String(val) + ENCRYPTED
+  }
+}
+
+function decrypt(val : string | Buffer) : string | Buffer {
+  if (val instanceof Buffer) {
+    let newVal = String(val)
+    newVal = newVal.replace(ENCRYPTED, "")
+    return Buffer.from(newVal)
+  } else {
+    let newVal = val.replace(ENCRYPTED, "")
+    return newVal;
+  }
+}
+
 class MockSession implements SessionInterface {
 
   store: any
@@ -18,13 +39,15 @@ class MockSession implements SessionInterface {
   async getFile(path: string, options?: GetFileOptions): Promise<string | ArrayBuffer> {
     
     if (typeof this.store[path] != "undefined"){
-      return this.store[path]
+      if (options && options.decrypt) return decrypt(this.store[path])
+      else return this.store[path]
     }
     throw new Error(`Key '${path}' does not exist!`)
   }
 
   async putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string> {
-    this.store[path] = content
+    if (options && options.encrypt) this.store[path] = encrypt(content)
+    else this.store[path] = content
     return "";
   }
 
@@ -84,14 +107,23 @@ suite(testCommon)
 
 test('Example', (t) => {
   let userSession = getSession(); 
-  const db = levelup(new GaiaLevelDOWN("Not implemented!", userSession))
-  db.put('foo', 'bar', function (err) {
+  const db = levelup(new GaiaLevelDOWN("/prefix/location/", userSession))
+  let putOpts : PutFileOptions = {
+    encrypt: true, 
+    sign: false
+  }
+  db.put('foo', 'bar', putOpts, function (err) {
     if (err) throw err
   
-    db.get('foo', function (err, value) {
+    let getOpts : GetFileOptions = {
+      decrypt: true, 
+      verify: false,
+    }
+    db.get('foo', getOpts, function (err, value) {
       if (err) throw err
   
       console.log(String(value)) // 'bar'
+      t.equal(String(value), 'bar', 'Got the same value')
       t.end()
     })
   })
