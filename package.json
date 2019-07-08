@@ -5,6 +5,8 @@
   "engines": {
     "node": ">= 10.13 <11"
   },
+  "main": "build/src/main.js",
+  "types": "build/src/main.d.ts",
   "devDependencies": {
     "@types/abstract-leveldown": "^5.0.1",
     "@types/immediate": "^3.2.0",
@@ -23,7 +25,9 @@
     "tsutils": "~3.14.0",
     "typescript": "~3.5.0"
   },
+    
   "scripts": {
+    "prepublish": "npm run build",
     "clean": "rimraf coverage build tmp",
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",

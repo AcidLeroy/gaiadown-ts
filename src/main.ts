@@ -15,6 +15,8 @@ import {
 } from 'abstract-leveldown';
 import {
   SessionInterface,
+  GetFileOptions, 
+  PutFileOptions
 } from './blockstack-interfaces'
 
 class GaiaIterator extends AbstractIterator<string, string | Buffer> {
@@ -256,5 +258,8 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
   }
 
 }
+// Export types for options
+export {GetFileOptions, PutFileOptions}
 
+// Export the class
 export default GaiaLevelDOWN; 
