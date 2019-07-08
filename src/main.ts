@@ -143,7 +143,12 @@ class GaiaLevelDOWN extends AbstractLevelDOWN<string, string | Buffer> {
     this.userSession.getFile(key, options).then(x => {
       if (cb) {
         log.debug("get: Succces, callback provided")
+       
         immediate(() => {
+          if (x == null) {
+            log.debug('get: failure, value not found!')
+            return cb(new Error('NotFound'), undefined)
+          }
           log.debug(`get: key '${key}' = '${x}'.`)
           if (x instanceof ArrayBuffer) {
             log.debug(`get: returned an ArrayBuffer.`)

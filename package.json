@@ -1,6 +1,6 @@
 {
   "name": "gaiadown-ts",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Gaia backend for LevelUP DB.",
   "keywords": ["gaia", "blockstack", "leveldb", "database", "peer-to-peer", "p2p"],
   "repository": "github:acidleroy/gaiadown-ts",

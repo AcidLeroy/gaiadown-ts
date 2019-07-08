@@ -36,13 +36,14 @@ class MockSession implements SessionInterface {
     this.store = {};
   }
 
-  async getFile(path: string, options?: GetFileOptions): Promise<string | ArrayBuffer> {
+  async getFile(path: string, options?: GetFileOptions): Promise<string | ArrayBuffer > {
     
-    if (typeof this.store[path] != "undefined"){
+    if (typeof this.store[path] == "undefined"){
+      return null; 
+    }
       if (options && options.decrypt) return decrypt(this.store[path])
       else return this.store[path]
-    }
-    throw new Error(`Key '${path}' does not exist!`)
+    
   }
 
   async putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string> {
