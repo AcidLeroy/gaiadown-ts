@@ -11,7 +11,7 @@ This allows you to encrypt/decrypt and sign/verify your data.
 
 
 ```ts
-import GaiaDOWN from 'gaiadown-ts' 
+import GaiaDOWN, {PutFileOptions, GetFileOptions} from 'gaiadown-ts' 
 import levelup from 'levelup'
 
 const db = levelup(new GaiaLevelDOWN("/prefix/location/", userSession))
