@@ -12,11 +12,11 @@ This allows you to encrypt/decrypt and sign/verify your data.
 
 # Example
 ```ts
-import GaiaDOWN, {PutFileOptions, GetFileOptions} from 'gaiadown-ts' 
+import GaiaLevelDOWN, {PutFileOptions, GetFileOptions} from 'gaiadown-ts' 
 import levelup from 'levelup'
 
 // Grab the UserSession object after logging in.
-const db = levelup(new GaiaDOWN("/prefix/location/", userSession))
+const db = levelup(new GaiaLevelDOWN("/prefix/location/", userSession))
   // Can pass encrypt and sign options, same options as UserSession
   let putOpts : PutFileOptions = {
     encrypt: true, 
