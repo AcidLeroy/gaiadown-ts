@@ -6,7 +6,7 @@ This allows you to encrypt/decrypt and sign/verify your data.
 
 
 [![Build Status](https://travis-ci.com/AcidLeroy/gaiadown-ts.svg?branch=master)](https://travis-ci.com/AcidLeroy/gaiadown-ts)
-
+[![npm version](https://badge.fury.io/js/gaiadown-ts.svg)](https://badge.fury.io/js/gaiadown-ts)
 # Installation
 `npm install gaiadown-ts`
 
