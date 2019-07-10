@@ -47,6 +47,10 @@ class MockSession implements SessionInterface {
   }
 
   async putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string> {
+
+    if(!(content instanceof Buffer) && (typeof content !== "string")){
+      throw new Error('Value must be a string or a Buffer!')
+    }
     if (options && options.encrypt) this.store[path] = encrypt(content)
     else this.store[path] = content
     return "";

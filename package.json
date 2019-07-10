@@ -1,11 +1,18 @@
 {
   "name": "gaiadown-ts",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Gaia backend for LevelUP DB.",
-  "keywords": ["gaia", "blockstack", "leveldb", "database", "peer-to-peer", "p2p"],
+  "keywords": [
+    "gaia",
+    "blockstack",
+    "leveldb",
+    "database",
+    "peer-to-peer",
+    "p2p"
+  ],
   "repository": "github:acidleroy/gaiadown-ts",
   "author": {
-    "name": "Cody Eilar", 
+    "name": "Cody Eilar",
     "email": "cody@mylens.io",
     "url": "https://github.com/acidleroy"
   },
@@ -32,7 +39,6 @@
     "tsutils": "~3.14.0",
     "typescript": "~3.5.0"
   },
-    
   "scripts": {
     "prepublish": "npm run build",
     "clean": "rimraf coverage build tmp",
@@ -47,6 +53,7 @@
     "immediate": "^3.2.3",
     "levelup": "^4.1.0",
     "loglevel": "^1.6.3",
+    "lru": "^3.1.0",
     "ltgt": "^2.2.1",
     "tslib": "~1.10.0"
   }
