@@ -18,9 +18,13 @@
     "noImplicitThis": false,
     "strictNullChecks": false,
     "declaration": true,
+    "esModuleInterop": true, 
+    "outDir": "build",
+    "rootDir": "."
   },
   "include": [
     "src/**/*",
-    "__tests__/**/*"
+    "__tests__/**/*", 
+    "node_modules/blockstack/lib/**/*"
   ]
 }

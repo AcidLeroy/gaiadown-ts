@@ -16,9 +16,6 @@
     "email": "cody@mylens.io",
     "url": "https://github.com/acidleroy"
   },
-  "engines": {
-    "node": ">= 10.13 <11"
-  },
   "main": "build/src/main.js",
   "types": "build/src/main.d.ts",
   "devDependencies": {

@@ -1,4 +1,5 @@
-import * as test from "tape";
+//import * as test from "tape";
+import test from 'tape'; 
 import * as log from 'loglevel';
 import * as blockstack from 'blockstack'; 
 import levelup from 'levelup'
@@ -7,6 +8,9 @@ const suite = require('abstract-leveldown/test')
 import { SessionInterface, GetFileOptions, PutFileOptions } from '../src/blockstack-interfaces';
 import GaiaLevelDOWN from '../src/main';
 // import LevelUp from 'levelup';
+// import {SessionOptions} from 'blockstack/src/auth/sessionData'
+import {InstanceDataStore} from 'blockstack/src/auth/sessionStore'
+
 
 const ENCRYPTED : string = "ENCRYPTED"
 
@@ -48,7 +52,7 @@ class MockSession implements SessionInterface {
 
   async putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string> {
 
-    if(!(content instanceof Buffer) && (typeof content !== "string")){
+    if(!(content instanceof Buffer) && (typeof content !== "string") ){
       throw new Error('Value must be a string or a Buffer!')
     }
     if (options && options.encrypt) this.store[path] = encrypt(content)
@@ -81,17 +85,32 @@ function getSession() {
   if (process.env.LEVEL_DB_INTEGRATION){
     const appConfig = new blockstack.AppConfig(
       ['store_write'], 
-      'http://localhost:3000'
+      'localhost:3000'
     )
 
-    return new blockstack.UserSession({
-      appConfig: appConfig, 
-      sessionOptions: {
-        appPrivateKey: process.env.LEVEL_DB_APP_PRIVATE_KEY,
-        username: process.env.LEVEL_DB_USERNAME,
-        hubUrl: 'https://hub.blockstack.org',
+   
+    const dataStore = new InstanceDataStore({ 
+      userData: {
+        appPrivateKey: process.env.LEVEL_DB_APP_PRIVATE_KEY, /* A user's app private key */
+        hubUrl: 'https://hub.blockstack.org', /* A user's gaia hub server */
+        /* The rest of the properties can be null */
+        username: process.env.LEVEL_DB_USERNAME, 
+        decentralizedID: process.env.LEVEL_DB_DECENTRALIZED_ID, 
+        identityAddress: null, 
+        authResponseToken: null, 
+        profile: null
       }
     })
+
+    console.log("dataStore = ", dataStore)
+
+    let session = new blockstack.UserSession({
+      appConfig: appConfig, 
+      sessionStore: dataStore
+    })
+    console.log('session = ', session)
+    session.putFile('test', 'testing')
+    return session
   } else {
     return new MockSession(); 
   }
@@ -113,6 +132,8 @@ var testCommon = suite.common({
 })
 
 suite(testCommon)
+
+// test('Valid')
 
 test('Example', (t) => {
   let userSession = getSession(); 
