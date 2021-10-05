@@ -1,7 +1,7 @@
 # GaiaDown
 
 [Gaia](https://github.com/blockstack/gaia) storage backend for [LevelUP](https://github.com/Level/levelup). The API implements the 
-[abstract-leveldown](https://github.com/Level/abstract-leveldown) interface. Specifically, this module needs a [UserSession](https://blockstack.github.io/blockstack.js/classes/usersession.html) object to create the `GaiaDOWN` instance. Furthermore, all the options that `getFile` and `putFile` take can also be used in the LevelDB instance. 
+[abstract-leveldown](https://github.com/Level/abstract-leveldown) interface. Specifically, this module needs a [UserSession](https://github.com/blockstack/stacks.js/blob/1af7a18b1017981f5b44c1006d940eb4648d0491/packages/auth/src/userSession.ts#L48) object to create the `GaiaDOWN` instance. Furthermore, all the options that `getFile` and `putFile` take can also be used in the LevelDB instance. 
 This allows you to encrypt/decrypt and sign/verify your data. 
 
 
